@@ -6,6 +6,13 @@ The code in this repository creates similar filling patterns. The algorithm is d
 ![Alternate Filling 01](readme_data/alternate_filling_01.png)
 ![Alternate Filling 02](readme_data/alternate_filling_02.png)
 
+## Execution notes
+
+To run the code, run the following from the `src` folder:
+```shell script
+python alternate_fillings
+```
+
 Running the code requires Python 3.6 or up.
 
 ## Efficiency notes

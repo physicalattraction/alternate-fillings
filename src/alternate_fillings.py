@@ -20,9 +20,10 @@ def now() -> str:
 
 
 class AlternateFilling:
-    src_dir = os.path.dirname(__file__)
-    root_dir = os.path.dirname(src_dir)
-    img_dir = os.path.join(root_dir, 'img')
+    # The abspath is necessary in order to be able to run the code as a module
+    src_dir: str = os.path.abspath(os.path.dirname(__file__))
+    root_dir: str = os.path.dirname(src_dir)
+    img_dir: str = os.path.join(root_dir, 'img')
 
     width: int
     height: int
