@@ -6,17 +6,9 @@ from time import sleep
 
 import matplotlib.path
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from config import *
-
-
-def now() -> str:
-    """
-    Return the current date and timestamp in second precision
-    """
-
-    return datetime.now().strftime('%y%m%d%H%M%S')
 
 
 class AlternateFilling:
@@ -28,22 +20,20 @@ class AlternateFilling:
     width: int
     height: int
     img: Image
-    draw: ImageDraw
 
     def __init__(self):
         self.width = CANVAS_SIZE
         self.height = CANVAS_SIZE
         self.img = Image.new('RGB', (self.width, self.height), 'white')
-        self.draw = ImageDraw.Draw(self.img)
 
     @staticmethod
     def draw_multiple_images(nr_images: int = 1):
         for _ in range(nr_images):
-            start_time = now()
+            start_time = AlternateFilling._now()
             alternate_filling = AlternateFilling()
             alternate_filling.draw_canvas()
             alternate_filling.save_img()
-            while now() == start_time:
+            while AlternateFilling._now() == start_time:
                 # Since we have seconds in the filename, we shouldn't continue
                 # drawing the next earthquake until the second is over
                 sleep(0.01)
@@ -66,7 +56,7 @@ class AlternateFilling:
         Save the image to the image directory with a predefined filename, based on the current timestamp
         """
 
-        filename = f'alternate_filling_{now()}.png'
+        filename = f'alternate_filling_{self._now()}.png'
         full_path = os.path.join(self.img_dir, filename)
         self.img.save(full_path)
 
@@ -116,6 +106,14 @@ class AlternateFilling:
     def _rotate_point(point: complex, angle: float) -> complex:
         r, phi = cmath.polar(point)
         return cmath.rect(r, phi + angle)
+
+    @staticmethod
+    def _now() -> str:
+        """
+        Return the current date and timestamp in second precision
+        """
+
+        return datetime.now().strftime('%y%m%d%H%M%S')
 
 
 if __name__ == '__main__':

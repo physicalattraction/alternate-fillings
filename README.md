@@ -8,12 +8,12 @@ The code in this repository creates similar filling patterns. The algorithm is d
 
 ## Execution notes
 
-To run the code, run the following from the `src` folder:
+There are multiple implementations of the same algorithm, one in OOP and on in functional. To run the code, run the following from the `src` folder:
 ```shell script
-python alternate_fillings
+python alternate_fillings_<xxx>
 ```
 
-Running the code requires Python 3.6 or up.
+Where <xxx> is either oop or functional. Running the code requires Python 3.6 or up. 
 
 ## Efficiency notes
 
