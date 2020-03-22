@@ -43,7 +43,7 @@ class AlternateFilling:
         self.draw = ImageDraw.Draw(self.img)
 
     @staticmethod
-    def draw_multiple_images(nr_images: int):
+    def draw_multiple_images(nr_images: int = 1):
         for _ in range(nr_images):
             start_time = now()
             alternate_filling = AlternateFilling()
