@@ -8,14 +8,7 @@ import matplotlib.path
 import numpy as np
 from PIL import Image, ImageDraw
 
-CANVAS_SIZE = 400
-MIN_LENGTH = 0.6 * CANVAS_SIZE
-MAX_LENGTH = CANVAS_SIZE
-MIN_WIDTH = 0.05 * CANVAS_SIZE
-MAX_WIDTH = 0.2 * CANVAS_SIZE
-NR_RECTANGLES = 10
-
-ALL_RECTANGLES_FULLY_ON_CANVAS = False
+from config import *
 
 
 def now() -> str:
