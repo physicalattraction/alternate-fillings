@@ -3,7 +3,7 @@ Module with all drawing configuration
 """
 
 # The canvas size in number of pixels. Note that the algorithm scales quadratically with this constant.
-CANVAS_SIZE = 100
+CANVAS_SIZE = 1000
 
 # Each rectangle has a long and a short side. The long side is called the length, the short side is called the width.
 # These four number mark the range from which these lengths and widths are taken randomly.

@@ -3,56 +3,15 @@ import os.path
 import random
 import timeit
 from datetime import datetime
+from multiprocessing import Pool
 from time import sleep
+from typing import Tuple
 
 import matplotlib.path
 import numpy as np
 from PIL import Image
 
 from config import *
-
-
-def draw_multiple_images(nr_images: int = 1):
-    for _ in range(nr_images):
-        start_time = _now()
-        img = draw_canvas()
-        save_img(img)
-        while _now() == start_time:
-            # Since we have seconds in the filename, we shouldn't continue
-            # drawing the next earthquake until the second is over
-            sleep(0.01)
-
-
-def draw_canvas() -> Image:
-    polygons = [_get_random_rectangle() for _ in range(NR_RECTANGLES)]
-    nr_polygons_containing_pixel = [
-        np.sum([polygon.contains_point((x, y)) for polygon in polygons])
-        for x in range(CANVAS_SIZE)
-        for y in range(CANVAS_SIZE)
-    ]
-    pixel_data = [
-        (0, 0, 0) if count % 2 == 1 else (255, 255, 255)
-        for count in nr_polygons_containing_pixel
-    ]
-
-    img = Image.new('RGB', (CANVAS_SIZE, CANVAS_SIZE), 'white')
-    img.putdata(pixel_data)
-    return img
-
-
-def save_img(img: Image):
-    """
-    Save the image to the image directory with a predefined filename, based on the current timestamp
-    """
-
-    # The abspath is necessary in order to be able to run the code as a module
-    src_dir: str = os.path.abspath(os.path.dirname(__file__))
-    root_dir: str = os.path.dirname(src_dir)
-    img_dir: str = os.path.join(root_dir, 'img')
-
-    filename = f'alternate_filling_{_now()}.png'
-    full_path = os.path.join(img_dir, filename)
-    img.save(full_path)
 
 
 def _get_random_rectangle() -> matplotlib.path.Path:
@@ -103,6 +62,13 @@ def _rotate_point(point: complex, angle: float) -> complex:
     return cmath.rect(r, phi + angle)
 
 
+polygons = [_get_random_rectangle() for _ in range(NR_RECTANGLES)]
+
+
+def _nr_polygons_containing_pixel_function(point: Tuple[int, int]):
+    return np.sum([polygon.contains_point(point) for polygon in polygons])
+
+
 def _now() -> str:
     """
     Return the current date and timestamp in second precision
@@ -111,5 +77,50 @@ def _now() -> str:
     return datetime.now().strftime('%y%m%d%H%M%S')
 
 
+def draw_canvas(nr_processes: int = 10) -> Image:
+    points = [(x, y) for x in range(CANVAS_SIZE) for y in range(CANVAS_SIZE)]
+    with Pool(nr_processes) as pool:
+        nr_polygons_containing_pixel = pool.map(_nr_polygons_containing_pixel_function, points)
+
+    pixel_data = [
+        (0, 0, 0) if count % 2 == 1 else (255, 255, 255)
+        for count in nr_polygons_containing_pixel
+    ]
+
+    img = Image.new('RGB', (CANVAS_SIZE, CANVAS_SIZE), 'white')
+    img.putdata(pixel_data)
+    return img
+
+
+def save_img(img: Image):
+    """
+    Save the image to the image directory with a predefined filename, based on the current timestamp
+    """
+
+    # The abspath is necessary in order to be able to run the code as a module
+    src_dir: str = os.path.abspath(os.path.dirname(__file__))
+    root_dir: str = os.path.dirname(src_dir)
+    img_dir: str = os.path.join(root_dir, 'img')
+
+    filename = f'alternate_filling_{_now()}.png'
+    full_path = os.path.join(img_dir, filename)
+    img.save(full_path)
+
+
+def draw_multiple_images(nr_images: int = 1, nr_processes: int = 10):
+    for _ in range(nr_images):
+        start_time = _now()
+        img = draw_canvas(nr_processes)
+        save_img(img)
+        # while _now() == start_time:
+        # Since we have seconds in the filename, we shouldn't continue
+        # drawing the next earthquake until the second is over
+        # sleep(0.01)
+
+
 if __name__ == '__main__':
-    print(timeit.timeit(draw_multiple_images, number=2)) # 400 = 10.9
+    for nr_processes in list(range(1, 11)) + list(range(15, 41, 5)):
+        def run():
+            return draw_multiple_images(nr_images=1, nr_processes=nr_processes)
+
+        print(nr_processes, timeit.timeit(run, number=5))
